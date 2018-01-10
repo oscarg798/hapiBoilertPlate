@@ -2,6 +2,7 @@ package co.com.babyrecord.profile
 
 
 import android.app.Fragment
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
@@ -113,6 +114,10 @@ class BabyProfileFragment : Fragment(), IBabyProfileFragmentView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         mPresenter.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun getViewContext(): Context? {
+        return activity
     }
 
     companion object {

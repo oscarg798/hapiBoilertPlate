@@ -30,7 +30,6 @@
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/ic_calendar"
                 android:drawablePadding="16dp"
-                android:fontFamily="@font/roboto_medium"
                 android:gravity="center"
                 android:textColor="@color/mdtp_white"
                 android:textSize="18sp"
@@ -38,7 +37,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/mIVNext"
                 app:layout_constraintStart_toEndOf="@+id/mIVPrevious"
                 app:layout_constraintTop_toTopOf="@+id/mIVPrevious"
-                tools:fontFamily="@font/fira_sans_bold"
+                android:fontFamily="@font/fira_sans_bold"
                 tools:text="Jan 1 2018" />
 
             <ImageView

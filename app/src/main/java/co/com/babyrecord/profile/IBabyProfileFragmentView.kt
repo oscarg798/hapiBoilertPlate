@@ -1,5 +1,6 @@
 package co.com.babyrecord.profile
 
+import android.content.Context
 import android.text.SpannableString
 import co.com.babyrecord.IBaseView
 import co.com.core.models.Baby
@@ -26,4 +27,6 @@ interface IBabyProfileFragmentView : IBaseView {
     fun hideNoBabyMessage()
 
     fun showBabyAge(birthDay: Long)
+
+    fun getViewContext(): Context?
 }

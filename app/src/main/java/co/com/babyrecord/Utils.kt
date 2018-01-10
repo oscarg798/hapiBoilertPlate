@@ -74,18 +74,17 @@ class Utils private constructor() {
 
     }
 
-    fun boldTextPrefix(text: String): SpannableString {
-
+    fun boldTextPrefix(text: String, color: Int= Color.BLACK): SpannableString {
         val spannable = SpannableString(text)
-        spannable.setSpan(ForegroundColorSpan(Color.BLACK), 0, text.indexOf(":") + 1,
+        spannable.setSpan(ForegroundColorSpan(color), 0, text.indexOf(":") + 1,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         return spannable
     }
 
-     fun requestWidgetUpdate(context:Context) {
+    fun requestWidgetUpdate(context: Context) {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
         intent.component = ComponentName(context, RecordsWidget::class.java)
-         context.sendBroadcast(intent)
+        context.sendBroadcast(intent)
     }
 
     private object Holder {

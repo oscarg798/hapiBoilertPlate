@@ -2,8 +2,10 @@ package co.com.babyrecord.profile
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.graphics.Color
 import co.com.babyrecord.BABY_KEY
 import co.com.babyrecord.CREATE_OR_EDIT_BABY_REQUEST_CODE
+import co.com.babyrecord.R
 import co.com.babyrecord.Utils
 import co.com.core.models.Baby
 import co.com.core.use_cases.baby.GetBabyUseCase
@@ -63,13 +65,15 @@ class BabyProfileFragmentPresenter : IBabyProfileFragmentPresenter {
         if (baby.weight === null) {
             mView?.hideWeight()
         } else {
-            mView?.showWeight(Utils.Companion.instance.boldTextPrefix("Weight: ${baby.weight} pounds"))
+            mView?.showWeight(Utils.Companion.instance.boldTextPrefix("Weight:\n${baby.weight} pounds",
+                    mView?.getViewContext()?.resources?.getColor(R.color.colorPrimary) ?: Color.BLACK))
         }
 
         if (baby.height === null) {
             mView?.hideHeight()
         } else {
-            mView?.showHeight(Utils.Companion.instance.boldTextPrefix("Height: ${baby.height} cm"))
+            mView?.showHeight(Utils.Companion.instance.boldTextPrefix("Height:\n${baby.height} cm",
+                    mView?.getViewContext()?.resources?.getColor(R.color.colorPrimary) ?: Color.BLACK))
         }
 
     }
