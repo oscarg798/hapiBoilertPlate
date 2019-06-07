@@ -2,106 +2,72 @@ var Hapi = require('hapi');
 const Vision = require('vision');
 const Inert = require('inert');
 var config = require('./config.js');
-var routes = require('../routes');
 var axios = require('axios');
 var moment = require('moment');
 const Authenticate = require('../libs/authenticate.js');
-var server = new Hapi.Server();
+const routes = require('../routes/index')
 
-server.connection({
-    port: config.PORT,
-    routes: {
-        cors: true
-    }
-});
+module.exports = (async () => {
+    const server = await new Hapi.Server({
+        host: 'localhost',
+        port: 3000,
+    });
 
-var goodOptions = {
-    ops: {
-        interval: 1000
-    },
-    reporters: {
-        myConsoleReporter: [{
-            module: 'good-squeeze',
-            name: 'Squeeze',
-            args: [{
-                log: '*',
-                response: '*',
-                error: '*'
-            }]
-        }, {
-            module: 'good-console'
-        }, 'stdout']
-    }
-}
-
-if (process.env.NODE_ENV === 'test') {
-    goodOptions.reporters[0].events = {}
-}
-
-server.register([Inert, Vision, {
-        register: require('good'),
-        options: goodOptions
-    },
-
-    {
-        register: require('hapi-swagger'),
-        options: {
-            info: {
-                title: "The Name",
-                version: moment(Date.now()).format('HH:mm:ss YYYY-MM-DD'), //TODO: Fix api version and base path.
-            },
-            securityDefinitions: {
-                'Bearer': {
-                    'type': 'apiKey',
-                    'name': 'Authorization',
-                    'in': 'header',
-                    'x-keyPrefix': 'Bearer '
+    await server.register([
+        Inert,
+        Vision,
+        {
+            plugin: require('hapi-swagger'),
+            options: {
+                info: {
+                    title: "The Name",
+                    version: moment(Date.now()).format('HH:mm:ss YYYY-MM-DD'), //TODO: Fix api version and base path.
+                },
+                securityDefinitions: {
+                    'Bearer': {
+                        'type': 'apiKey',
+                        'name': 'Authorization',
+                        'in': 'header',
+                        'x-keyPrefix': 'Bearer '
+                    }
                 }
-            },
-            security: [{
-                'Bearer': []
-            }],
-            sortEndpoints: 'path',
-            sortTags: 'name'
-        }
-    },
-    require('hapi-auth-bearer-token')
-], function (err) {
-    if (err) {
-        console.error(err);
-        throw err;
-    }
+            }
+        },
+        require('hapi-auth-bearer-token')
+    ]);
 
     server.auth.strategy('token', 'bearer-access-token', {
-        allowQueryToken: true, // optional, true by default
-        allowMultipleHeaders: false, // optional, false by default
-        accessTokenName: 'token', // optional, 'token' by default
+        allowQueryToken: true,
+        allowMultipleHeaders: false,
+        accessTokenName: 'token',
+        validate: async (req, token, h) => {
+            try {
+                const user = await Authenticate.auth(token)
+                const isValid = user != null;
+                const credentials = {
+                    token
+                };
+                const artifacts = {
+                    user
+                }
 
-        validateFunc: function (token, callback) {
-            Authenticate.auth(token).then(user => {
-                    callback(null, true, user)
-                })
-                .catch(err => {
-                    callback(null, false, {
-                        message: err,
-                        token: token
-                    });
-                });
+                return {
+                    isValid,
+                    credentials,
+                    artifacts
+                }
+            } catch (error) {
+                return error
+            }
         }
     });
 
-    server.route(routes);
-
-    server.start(function (err) {
-        if (err) {
-            console.error(err);
-            throw err;
-        }
+    try {
+        await server.start();
         console.log('Server running at:', server.info.uri);
-    });
-});
+    } catch (err) {
+        console.log(err);
+    }
 
-
-
-
-module.exports = server;
+    server.route(routes)
+})();

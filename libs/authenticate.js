@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config.js');
@@ -14,9 +15,9 @@ function auth(token) {
       return reject('Authentication token is required');
     }
     let payload = jwt.verify(token, config.secret);
-    payload = payload._doc;
     if (payload) {
       return resolve({
+        id: payload._id,
         email: payload.email,
         uuid: payload.uuid,
         token: token
@@ -25,7 +26,6 @@ function auth(token) {
 
     return reject('not user found');
   });
-
 }
 
 function create(user) {
@@ -33,6 +33,6 @@ function create(user) {
     if (!user) {
       return reject('must provide an user');
     }
-    return resolve(jwt.sign(user, config.secret));
+    return resolve(jwt.sign(JSON.stringify(user), config.secret));
   });
 }
